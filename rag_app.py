@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # youtube video ID
-video_id = "Gfr50f6ZBvo"
+# video_id = "Gfr50f6ZBvo"
+video_id = "JcVHf4X_dqY"
 
 try:
     api = YouTubeTranscriptApi()
@@ -16,7 +17,7 @@ try:
 
     transcript = " ".join(chunk.text for chunk in transcript_list)
 
-    # print(transcript)
+    print(transcript)
 
 except TranscriptsDisabled:
     print("No captions available for this video.")
@@ -26,4 +27,14 @@ except TranscriptsDisabled:
 splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap=200)
 chunks = splitter.create_documents([transcript])
 
-print(len(chunks))
+# print(len(chunks))
+
+# Embedding Generation and Storing in Vector Store
+embeddings = OpenAIEmbeddings(model='text-embedding-3-small')
+vector_store = FAISS.from_documents(chunks, embeddings)
+
+vector_store.index_to_docstore_id
+
+
+
+
