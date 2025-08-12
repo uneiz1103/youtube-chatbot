@@ -16,7 +16,14 @@ try:
 
     transcript = " ".join(chunk.text for chunk in transcript_list)
 
-    print(transcript)
+    # print(transcript)
 
 except TranscriptsDisabled:
     print("No captions available for this video.")
+
+# Text Splitter
+
+splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap=200)
+chunks = splitter.create_documents([transcript])
+
+print(len(chunks))
