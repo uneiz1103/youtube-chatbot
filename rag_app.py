@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # youtube video ID
-# video_id = "Gfr50f6ZBvo"
-video_id = "JcVHf4X_dqY"
+video_id = "Gfr50f6ZBvo"
 
 try:
     api = YouTubeTranscriptApi()
@@ -35,6 +34,7 @@ vector_store = FAISS.from_documents(chunks, embeddings)
 
 vector_store.index_to_docstore_id
 
+# Retrieval
+retriever = vector_store.as_retriever(search_type='similarity', search_kwargs={'k':4})
 
-
-
+retriever.invoke('What is deepmind')
