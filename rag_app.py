@@ -16,7 +16,7 @@ try:
 
     transcript = " ".join(chunk.text for chunk in transcript_list)
 
-    print(transcript)
+    # print(transcript)
 
 except TranscriptsDisabled:
     print("No captions available for this video.")
@@ -32,7 +32,7 @@ chunks = splitter.create_documents([transcript])
 embeddings = OpenAIEmbeddings(model='text-embedding-3-small')
 vector_store = FAISS.from_documents(chunks, embeddings)
 
-vector_store.index_to_docstore_id
+# vector_store.index_to_docstore_id
 
 # Retrieval
 retriever = vector_store.as_retriever(search_type='similarity', search_kwargs={'k':4})
@@ -65,3 +65,7 @@ context_text = "\n\n".join(doc.page_content for doc in retrieved_docs)
 # print(context_text)
 
 final_prompt = prompt.invoke({"context": context_text, "question": question})
+
+# Generation
+answer = llm.invoke(final_prompt)
+print(answer.content)
