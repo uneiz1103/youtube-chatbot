@@ -3,6 +3,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
+from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,13 +43,18 @@ prompt = PromptTemplate(
     input_variables=['context', 'question']
 )
 
-#Step 5: Manual Flow
-question = "Is the topic of nuclear fusion discussed in this video? If yes, then what was discussed?"
+#Step 5: Chain Building
+def format_docs(retrieved_docs):
+    return "\n\n".join(doc.page_content for doc in retrieved_docs)
 
-retrieved_docs = retriever.invoke(question)
-context_text = "\n\n".join(doc.page_content for doc in retrieved_docs)
+parallel_chain = RunnableParallel({
+   'context': retriever | RunnableLambda(format_docs),
+   'question': RunnablePassthrough()
+})
 
-final_prompt = prompt.invoke({"context": context_text, "question": question})
-answer = llm.invoke(final_prompt)
+parser = StrOutputParser()
+main_chain = parallel_chain | prompt | llm | parser
 
-print("Manual Answer:\n", answer.content)
+#Step 6: Invoke Automated
+result = main_chain.invoke("Can you summarize the video?")
+print("Chain answer:\n", result)
